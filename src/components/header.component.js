@@ -1,27 +1,17 @@
 // eslint-disable-next-line prettier/prettier
 import React, { Component } from 'react';
-import {
-  AsyncStorage,
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TouchableOpacity,
-  FlatList,
-  Dimensions,
-  Alert,
-  ScrollView,
-} from 'react-native';
+import {StyleSheet, Text, View, Image} from 'react-native';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default class HeaderComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {station: {user: {}}};
-    this.check();
+    
   }
 
-  check() {
-    debugger;
+  componentDidMount() {
     AsyncStorage.getItem('station').then(res => {
       this.setState({station: JSON.parse(res)});
     });
@@ -30,14 +20,21 @@ export default class HeaderComponent extends Component {
   render() {
     return (
       <View
-        style={styles.card}
-        onPress={() => {
-          this.clickEventListener(item);
-        }}>
-        <Image style={styles.image} source={{uri: this.state.station.user.avatar}} />
+        style={[
+          styles.card,
+          this.props.status ? styles.connected : styles.disconnected,
+        ]}>
+        <Image
+          style={styles.image}
+          source={{uri: this.state.station.user.avatar}}
+        />
         <View style={styles.cardContent}>
-          <Text style={styles.name}>@{this.state.station.user.name} - {this.state.station.user.email}</Text>
-          <Text style={styles.count}>{this.state.station.key} - {this.state.station.deviceId}</Text>
+          <Text style={styles.name}>
+            @{this.state.station.user.name} - {this.state.station.user.email} - {this.props.status}
+          </Text>
+          <Text style={styles.count}>
+            {this.state.station.key} *- {this.state.station.deviceId}
+          </Text>
         </View>
       </View>
     );
@@ -64,7 +61,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#ebf0f7',
   },
-
+  connected: {backgroundColor: '#c6efdc'},
+  disconnected: {backgroundColor: '#ddd'},
   card: {
     padding: 10,
     flexDirection: 'row',
@@ -74,14 +72,14 @@ const styles = StyleSheet.create({
     fontSize: 18,
     flex: 1,
     alignSelf: 'center',
-    color: '#FFF',
+    color: '#000',
     fontWeight: 'bold',
   },
   count: {
     fontSize: 14,
     flex: 1,
     alignSelf: 'center',
-    color: '#eee',
+    color: '#333',
   },
   followButton: {
     marginTop: 10,
