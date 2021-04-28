@@ -10,96 +10,76 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
+
+import moment from 'moment';
+
 import HeaderComponent from '../../components/header.component';
+import Service, {Event} from '../../services/service';
+import Station from '../../services/station';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default class HomeScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: [
-        {
-          id: 1,
-          description:
-            'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.',
-          date: '2019-03-25 09:12:00',
-          color: '#228B22',
-          completed: 1,
-        },
-        {
-          id: 2,
-          description: 'Aenean massa. Cum sociis natoque penatibus et magnis.',
-          date: '2019-03-25 10:23:00',
-          color: '#FF00FF',
-          completed: 0,
-        },
-        {
-          id: 3,
-          description:
-            'nascetur ridiculus mus. Donec quam felis, ultricies dnec.',
-          date: '2019-03-25 11:45:00',
-          color: '#4B0082',
-          completed: 1,
-        },
-        {
-          id: 4,
-          description:
-            'Donec pede justo, fringilla vel, aliquet nec, vulputdate.',
-          date: '2019-03-25 09:27:00',
-          color: '#20B2AA',
-          completed: 0,
-        },
-        {
-          id: 5,
-          description:
-            'Nullam dictum felis eu pede mollis pretium. Integer tirr.',
-          date: '2019-03-25 08:13:00',
-          color: '#000080',
-          completed: 0,
-        },
-        {
-          id: 6,
-          description:
-            'ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas st.',
-          date: '2019-03-25 10:22:00',
-          color: '#FF4500',
-          completed: 1,
-        },
-        {
-          id: 7,
-          description:
-            'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.',
-          date: '2019-03-25 13:33:00',
-          color: '#FF0000',
-          completed: 0,
-        },
-        {
-          id: 8,
-          description:
-            'Maecenas nec odio et ante tincidunt tempus. Donec vitae .',
-          date: '2019-03-25 11:56:00',
-          color: '#EE82EE',
-          completed: 0,
-        },
-        {
-          id: 9,
-          description:
-            'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.',
-          date: '2019-03-25 15:00:00',
-          color: '#6A5ACD',
-          completed: 0,
-        },
-        {
-          id: 10,
-          description:
-            ' Aenean imperdiet. Etiam ultricies nisi vel augues aasde.',
-          date: '2019-03-25 12:27:00',
-          color: '#DDA0DD',
-          completed: 0,
-        },
-      ],
+      connected: false,
+      station: {user: {}},
+      data: [],
     };
   }
+  componentDidMount() {
+    this.service = new Service();
 
+    AsyncStorage.getItem('station').then(res => {
+      this.setState({station: JSON.parse(res)});
+    });
+
+    this.socket = this.service.socket;
+    this.socketListner();
+  }
+  socketListner() {
+    this.socket.on('disconnect', data => {
+      this.eventCallback({
+        id: 1,
+        description: ':: Connection to server lost.',
+        date: moment().format(),
+        color: '#ccc',
+        completed: 0,
+      });
+    });
+
+    this.socket.on('start', data => {
+      this.setState({connected: true});
+      this.eventCallback({
+        id: 1,
+        description:
+          ':: Connected to socket server \n \t with device ID ' +
+          new Station().deviceId,
+        date: moment().format(),
+        color: '#ccc',
+        completed: 1,
+      });
+    });
+
+    this.socket.on('connction-send-sms-' + new Station().deviceId, data => {
+      this.service.sendSms(data.to, data.message);
+      alert('bravo')
+      console.warn(data)
+      this.eventCallback({
+        id: 1,
+        description:
+          'SMS request to: ' + data.to + '\n message: ' + data.message,
+        date: moment().format(),
+        color: '##4CAF50',
+        completed: 1,
+      });
+    });
+  }
+  eventCallback(event) {
+    let data = this.state.data;
+    data.push(event);
+    this.setState({data});
+  }
   clickEventListener = item => {
     Alert.alert('Item selected: ' + item.description);
   };
@@ -126,12 +106,15 @@ export default class HomeScreen extends Component {
     return (
       <View style={styles.container}>
         <View style={{height: 100, backgroundColor: '#444'}}>
-          <HeaderComponent />
+          <HeaderComponent
+            station={this.state.station}
+            status={this.state.connected}
+          />
         </View>
         <FlatList
           style={styles.tasks}
           columnWrapperStyle={styles.listContainer}
-          data={this.state.data}
+          data={this.state.data.reverse()}
           keyExtractor={item => {
             return item.id;
           }}
@@ -147,13 +130,7 @@ export default class HomeScreen extends Component {
                   source={{uri: this.__getCompletedIcon(item)}}
                 />
                 <View style={styles.cardContent}>
-                  <Text
-                    style={[
-                      styles.description,
-                      this.__getDescriptionStyle(item),
-                    ]}>
-                    {item.description}
-                  </Text>
+                  <Text style={[styles.description]}>{item.description}</Text>
                   <Text style={styles.date}>{item.date}</Text>
                 </View>
               </TouchableOpacity>
@@ -175,11 +152,11 @@ const styles = StyleSheet.create({
   },
   cardContent: {
     marginLeft: 20,
-    marginTop: 10,
+    marginTop: 0,
   },
   image: {
-    width: 25,
-    height: 25,
+    width: 15,
+    height: 15,
   },
 
   card: {
@@ -192,7 +169,7 @@ const styles = StyleSheet.create({
     shadowRadius: 7.49,
     elevation: 12,
 
-    marginVertical: 10,
+    marginVertical: 5,
     marginHorizontal: 10,
     backgroundColor: 'white',
     flexBasis: '46%',

@@ -8,12 +8,13 @@ import {
   TouchableOpacity,
   Image,
   Alert,
-  AsyncStorage,
+
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import axios from 'axios';
 
-import {server} from '../../../app';
+import {server} from '../../../app.json';
 import Station from '../../services/station';
 export default class UserDataAuth extends Component {
   constructor(props) {
@@ -24,11 +25,9 @@ export default class UserDataAuth extends Component {
       station: new Station(),
     };
   }
-  checkToken(){
-
-  }
+  checkToken() {}
   login() {
-    let server = 'http://192.168.100.20:8800';
+    //let server = 'http://192.168.100.20:8800';
     //const {email, password} = this.state;
     debugger;
     const req = {
@@ -41,11 +40,12 @@ export default class UserDataAuth extends Component {
     axios
       .post(server + '/api/v2/staion/autehenticate', req)
       .then(res => {
-        console.warn(res);
-        AsyncStorage.setItem('station', JSON.stringify(res.data.station)).then(res => {
-        });
-          this.props.navigation.navigate('Home');
-          alert('Station succefull authenticated');
+        AsyncStorage.setItem(
+          'station',
+          JSON.stringify(res.data.station),
+        ).then(res => {});
+        this.props.navigation.navigate('Home');
+        alert('Station succefull authenticated');
       })
       .catch(err => {
         alert(JSON.stringify(err));
