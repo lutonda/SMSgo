@@ -2,6 +2,8 @@ import {NativeModules} from 'react-native';
 
 import io from 'socket.io-client';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import {server} from '../../app.json';
 export default class Service {
   constructor() {
@@ -12,6 +14,11 @@ export default class Service {
     let DirectSms = NativeModules.DirectSms;
 
     DirectSms.sendDirectSms(to, message);
+  }
+  store(messages) {
+    AsyncStorage.setItem('messages', JSON.stringify(messages));
+
+    console.warn(messages);
   }
 }
 

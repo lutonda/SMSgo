@@ -33,6 +33,9 @@ export default class HomeScreen extends Component {
     AsyncStorage.getItem('station').then(res => {
       this.setState({station: JSON.parse(res)});
     });
+    AsyncStorage.getItem('messages').then(res => {
+      this.setState({data: JSON.parse(res) || []});
+    });
 
     this.socket = this.service.socket;
     this.socketListner();
@@ -40,7 +43,6 @@ export default class HomeScreen extends Component {
   socketListner() {
     this.socket.on('disconnect', data => {
       this.eventCallback({
-        id: 1,
         description: ':: Connection to server lost.',
         date: moment().format(),
         color: '#ccc',
@@ -51,7 +53,6 @@ export default class HomeScreen extends Component {
     this.socket.on('start', data => {
       this.setState({connected: true});
       this.eventCallback({
-        id: 1,
         description:
           ':: Connected to socket server \n \t with device ID ' +
           new Station().deviceId,
@@ -63,10 +64,8 @@ export default class HomeScreen extends Component {
 
     this.socket.on('connction-send-sms-' + new Station().deviceId, data => {
       this.service.sendSms(data.to, data.message);
-      alert('bravo')
-      console.warn(data)
+      console.warn(data);
       this.eventCallback({
-        id: 1,
         description:
           'SMS request to: ' + data.to + '\n message: ' + data.message,
         date: moment().format(),
@@ -78,6 +77,8 @@ export default class HomeScreen extends Component {
   eventCallback(event) {
     let data = this.state.data;
     data.push(event);
+    this.service.store(data);
+
     this.setState({data});
   }
   clickEventListener = item => {
@@ -106,10 +107,7 @@ export default class HomeScreen extends Component {
     return (
       <View style={styles.container}>
         <View style={{height: 100, backgroundColor: '#444'}}>
-          <HeaderComponent
-            station={this.state.station}
-            status={this.state.connected}
-          />
+          <HeaderComponent status={this.state.connected} />
         </View>
         <FlatList
           style={styles.tasks}
