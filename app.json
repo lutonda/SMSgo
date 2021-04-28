@@ -1,5 +1,5 @@
 {
   "name": "SMSgoApp",
   "displayName": "SMSgoApp",
-  "server":"http://localhost:8800"//"https://8800-eeda9109-8894-49f8-b0e8-8f9132c4c972.ws-eu01.gitpod.io"
+  "server":"http://192.168.100.18:9600"//"https://8800-eeda9109-8894-49f8-b0e8-8f9132c4c972.ws-eu01.gitpod.io"
 }
