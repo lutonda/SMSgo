@@ -16,7 +16,12 @@ export default class HeaderComponent extends Component {
       this.setState({station: JSON.parse(res)});
     });
   }
-
+  blink(){
+    
+    setTimeout(() => {
+      this.setState({isSending: false});
+    }, 5000);
+  }
   render() {
     return (
       <View
@@ -29,6 +34,7 @@ export default class HeaderComponent extends Component {
           source={{uri: this.state.station.user.avatar}}
         />
         <View style={styles.cardContent}>
+        <View style={{backgroundColor:'#11ff00', padding:5, width:5}}></View>
           <Text style={styles.name}>
             @{this.state.station.user.name} - {this.state.station.user.email} - {this.props.status}
           </Text>

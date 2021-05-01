@@ -13,5 +13,7 @@ export default class Station {
     this.systemVersion = DeviceInfo.getSystemVersion();
     this.systemName = DeviceInfo.getSystemName();
     this.deviceCountry = 'AO';
+    this.socketId = 0;
+    return this;
   }
 }
