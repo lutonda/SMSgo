@@ -22,6 +22,7 @@ export default class HomeScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      isSending: false,
       connected: false,
       station: {user: {}},
       data: [],
@@ -63,13 +64,16 @@ export default class HomeScreen extends Component {
     });
 
     this.socket.on('connction-send-sms-' + new Station().deviceId, data => {
+      this.setState({isSending: true});
       this.service.sendSms(data.to, data.message);
-      console.warn(data);
+      setTimeout(() => {
+        this.setState({isSending: false});
+      }, 5000);
       this.eventCallback({
         description:
           'SMS request to: ' + data.to + '\n message: ' + data.message,
         date: moment().format(),
-        color: '##4CAF50',
+        color: '#4CAF50',
         completed: 1,
       });
     });
@@ -107,8 +111,12 @@ export default class HomeScreen extends Component {
     return (
       <View style={styles.container}>
         <View style={{height: 100, backgroundColor: '#444'}}>
-          <HeaderComponent status={this.state.connected} />
+          <HeaderComponent
+            status={this.state.connected}
+            isSending={this.state.isSending}
+          />
         </View>
+        <Text>{this.state.isSending ? '...' : '#'}</Text>
         <FlatList
           style={styles.tasks}
           columnWrapperStyle={styles.listContainer}
