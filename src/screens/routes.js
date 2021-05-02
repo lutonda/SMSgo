@@ -1,9 +1,13 @@
 import SwitchComponent from '../components/switch.component';
 import {createAppContainer} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
+
+import {createBottomTabNavigator} from 'react-navigation-tabs';
+
 import QrCodeAuth from './auth/qrcode.auth';
 import UserDataAuth from './auth/userdata.auth';
 import HomeScreen from './home/home.screen';
+import DeviceScreen from './home/device.screen';
 const BeforeSignIn = createStackNavigator(
   {
     Login: {
@@ -19,15 +23,23 @@ const BeforeSignIn = createStackNavigator(
   },
 );
 
-const AfterSignIn = createStackNavigator(
+const AfterSignIn = createBottomTabNavigator(
   {
     Home: {
       screen: HomeScreen,
     },
+    Device: {
+      screen: DeviceScreen,
+    },
   },
   {
-    headerMode: 'none',
-    initialRouteKey: 'Home'},
+    initialRouteKey: 'Home',
+    tabBarOptions: {
+      activeTintColor: 'red',
+      inactiveTintColor: 'grey',
+      showIcon: true,
+    },
+  },
 );
 
 const AppNavigator = createStackNavigator(
@@ -41,6 +53,5 @@ const AppNavigator = createStackNavigator(
     initialRouteKey: 'Switch',
   },
 );
-
 
 export default createAppContainer(AppNavigator);
