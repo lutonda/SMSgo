@@ -12,23 +12,23 @@ export default class Service {
   constructor() {
     this.socket = io(server);
 
-    this.device = new Station();
+    this.station = new Station();
     this.socketServices();
     return this;
   }
 
   socketServices() {
-    this.socket.on('is-' + this.device.deviceId + '-active?', data => {
-      this.socket.emit('device-is-active!', {deviceId: this.device.deviceId});
+    this.socket.on('is-' + this.station.deviceId + '-active?', data => {
+      this.socket.emit('device-is-active!', {deviceId: this.station.deviceId});
     });
 
     this.socket.on('start', data => {
       this.socket.emit('update-socket-id', {
-        deviceId: this.device.deviceId,
+        deviceId: this.station.deviceId,
         sessionId: data,
       });
 
-      this.device.socketId = data;
+      this.station.socketId = data;
     });
   }
   sendSms(to, message) {

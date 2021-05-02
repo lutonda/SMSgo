@@ -27,9 +27,9 @@ export default class HomeScreen extends Component {
       station: {user: {}},
       data: [],
     };
+    this.service = new Service();
   }
   componentDidMount() {
-    this.service = new Service();
 
     AsyncStorage.getItem('station').then(res => {
       this.setState({station: JSON.parse(res)});
@@ -116,7 +116,7 @@ export default class HomeScreen extends Component {
             isSending={this.state.isSending}
           />
         </View>
-
+        <Text>{JSON.stringify(this.service.station)}</Text>
         <FlatList
           style={styles.tasks}
           columnWrapperStyle={styles.listContainer}

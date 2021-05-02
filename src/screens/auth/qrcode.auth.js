@@ -11,28 +11,48 @@ import {
 } from 'react-native';
 import UserDataAuth from './userdata.auth';
 
+import {server} from '../../../app.json';
+import QRCodeScanner from 'react-native-qrcode-scanner';
+import Station from '../../services/station';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 export default class QrCodeAuth extends Component {
-
   constructor(props) {
     super(props);
     let state = {
-      email   : '',
+      email: '',
       password: '',
-    }
+    };
   }
 
-  onClickListener = (viewId) => {
-    Alert.alert("Alert", "Button pressed "+viewId);
-  }
+  onClickListener = viewId => {
+    Alert.alert('Alert', 'Button pressed ' + viewId);
+  };
+
+  onSuccess = async data => {
+    const res = await axios.post(server + '/api/v2/staion/autehenticate/api', {
+      apiKey: data.data,
+      station: new Station(),
+    });
+    if (res.data) {
+      AsyncStorage.setItem(
+        'station',
+        JSON.stringify(res.data.station),
+      ).then(res => {});
+      this.props.navigation.navigate('Home');
+      alert('Station succefull authenticated');
+    }
+  };
 
   render() {
     return (
       <View style={styles.container}>
-        <View>
-        </View>
-
-        <TouchableOpacity style={styles.buttonContainer} onPress={() => this.props.navigation.navigate('Login')}>
-            <Text style={styles.btnText}>Voltar</Text>
+        <View />
+        <QRCodeScanner onRead={this.onSuccess} />
+        <TouchableOpacity
+          style={styles.buttonContainer}
+          onPress={() => this.props.navigation.navigate('Login')}>
+          <Text style={styles.btnText}>Voltar</Text>
         </TouchableOpacity>
       </View>
     );
@@ -51,15 +71,15 @@ const styles = StyleSheet.create({
   inputContainer: {
     borderBottomColor: '#F5FCFF',
     backgroundColor: '#FFFFFF',
-    borderRadius:30,
+    borderRadius: 30,
     borderBottomWidth: 1,
-    width:300,
-    height:45,
-    marginBottom:20,
+    width: 300,
+    height: 45,
+    marginBottom: 20,
     flexDirection: 'row',
-    alignItems:'center',
+    alignItems: 'center',
 
-    shadowColor: "#808080",
+    shadowColor: '#808080',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -69,46 +89,46 @@ const styles = StyleSheet.create({
 
     elevation: 5,
   },
-  inputs:{
-    height:45,
-    marginLeft:16,
+  inputs: {
+    height: 45,
+    marginLeft: 16,
     borderBottomColor: '#FFFFFF',
-    flex:1,
+    flex: 1,
   },
-  inputIcon:{
-    width:25,
-    height:25,
-    marginRight:15,
-    justifyContent: 'center'
+  inputIcon: {
+    width: 25,
+    height: 25,
+    marginRight: 15,
+    justifyContent: 'center',
   },
   buttonContainer: {
-    height:45,
+    height: 45,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom:20,
-    width:300,
-    borderRadius:30,
-    backgroundColor:'transparent'
+    marginBottom: 20,
+    width: 300,
+    borderRadius: 30,
+    backgroundColor: 'transparent',
   },
   btnForgotPassword: {
-    height:15,
+    height: 15,
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'flex-end',
-    marginBottom:10,
-    width:300,
-    backgroundColor:'transparent'
+    marginBottom: 10,
+    width: 300,
+    backgroundColor: 'transparent',
   },
   loginButton: {
-    backgroundColor: "#00b5ec",
+    backgroundColor: '#00b5ec',
 
-    shadowColor: "#808080",
+    shadowColor: '#808080',
     shadowOffset: {
       width: 0,
       height: 9,
     },
-    shadowOpacity: 0.50,
+    shadowOpacity: 0.5,
     shadowRadius: 12.35,
 
     elevation: 19,
@@ -116,7 +136,7 @@ const styles = StyleSheet.create({
   loginText: {
     color: 'white',
   },
-  bgImage:{
+  bgImage: {
     flex: 1,
     resizeMode,
     position: 'absolute',
@@ -124,8 +144,8 @@ const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'center',
   },
-  btnText:{
-    color:"white",
-    fontWeight:'bold'
-  }
+  btnText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
 });
