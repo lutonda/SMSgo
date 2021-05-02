@@ -68,7 +68,7 @@ export default class HomeScreen extends Component {
       this.service.sendSms(data.to, data.message);
       setTimeout(() => {
         this.setState({isSending: false});
-      }, 5000);
+      }, 10000);
       this.eventCallback({
         description:
           'SMS request to: ' + data.to + '\n message: ' + data.message,
@@ -116,11 +116,13 @@ export default class HomeScreen extends Component {
             isSending={this.state.isSending}
           />
         </View>
-        <Text>{this.state.isSending ? '...' : '#'}</Text>
+
         <FlatList
           style={styles.tasks}
           columnWrapperStyle={styles.listContainer}
-          data={this.state.data.reverse()}
+          data={this.state.data
+            .sort((a, b) => new Date(a.date) - new Date(b.date))
+            .reverse()}
           keyExtractor={item => {
             return item.id;
           }}

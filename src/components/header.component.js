@@ -8,19 +8,12 @@ export default class HeaderComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {station: {user: {}}};
-    
   }
 
   componentDidMount() {
     AsyncStorage.getItem('station').then(res => {
       this.setState({station: JSON.parse(res)});
     });
-  }
-  blink(){
-    
-    setTimeout(() => {
-      this.setState({isSending: false});
-    }, 5000);
   }
   render() {
     return (
@@ -31,12 +24,16 @@ export default class HeaderComponent extends Component {
         ]}>
         <Image
           style={styles.image}
-          source={{uri: this.state.station.user.avatar}}
+          source={
+            this.props.isSending
+              ? require('../assets/tenor.gif')
+              : {uri: this.state.station.user.avatar}
+          }
         />
         <View style={styles.cardContent}>
-        <View style={{backgroundColor:'#11ff00', padding:5, width:5}}></View>
           <Text style={styles.name}>
-            @{this.state.station.user.name} - {this.state.station.user.email} - {this.props.status}
+            @{this.state.station.user.name} - {this.state.station.user.email} -{' '}
+            {this.props.status}
           </Text>
           <Text style={styles.count}>
             {this.state.station.key} *- {this.state.station.deviceId}
@@ -66,6 +63,7 @@ const styles = StyleSheet.create({
     borderRadius: 45,
     borderWidth: 2,
     borderColor: '#ebf0f7',
+    overlayColor:'#c6efdc'
   },
   connected: {backgroundColor: '#c6efdc'},
   disconnected: {backgroundColor: '#ddd'},

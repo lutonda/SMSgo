@@ -38,8 +38,6 @@ export default class Service {
   }
   store(messages) {
     AsyncStorage.setItem('messages', JSON.stringify(messages));
-
-    console.warn(messages);
   }
 }
 
