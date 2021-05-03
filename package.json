@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.15.4",
+    "accordion-collapse-react-native": "^1.0.0",
     "aios": "^1.0.1",
     "axios": "^0.21.1",
     "moment": "^2.29.1",

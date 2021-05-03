@@ -12,6 +12,12 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import TimeAgo from 'react-native-timeago';
+import {
+  Collapse,
+  CollapseHeader,
+  CollapseBody,
+  AccordionList,
+} from 'accordion-collapse-react-native';
 
 export default class EventCardComponent extends Component {
   constructor(props) {
@@ -53,11 +59,8 @@ export default class EventCardComponent extends Component {
 
   render() {
     return (
-      <TouchableOpacity
-        onPress={() => {
-          this.clickEventListener(this.props.event);
-        }}>
-        <View
+      <Collapse>
+        <CollapseHeader
           style={[
             [styles.system, styles.message][this.props.event.type],
             styles.card,
@@ -83,8 +86,23 @@ export default class EventCardComponent extends Component {
             </Text>
             <TimeAgo time={this.props.event.date} interval={1000} />
           </View>
-        </View>
-      </TouchableOpacity>
+        </CollapseHeader>
+
+        <CollapseBody
+          style={{
+            flex: 1,
+            flexDirection: 'row',
+            marginLeft: 30,
+            marginRight: 30,
+          }}>
+          <View style={{flex: 1}}>
+            <Text>{this.props.event.id}</Text>
+          </View>
+          <View style={{flex: 1, textAlign: 'right'}}>
+            <Text style={{textAlign: 'right'}}>{this.props.event.date}</Text>
+          </View>
+        </CollapseBody>
+      </Collapse>
     );
   }
 }

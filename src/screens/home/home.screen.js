@@ -26,6 +26,7 @@ export default class HomeScreen extends Component {
     AsyncStorage.getItem('station').then(res => {
       this.setState({station: JSON.parse(res)});
     });
+
     AsyncStorage.getItem('messages').then(res => {
       this.setState({data: JSON.parse(res) || []});
     });
@@ -36,7 +37,7 @@ export default class HomeScreen extends Component {
   socketListner() {
     this.socket.on('disconnect', data => {
       this.eventCallback({
-        message: ':: Connection to server lost.',
+        message: '! Connection to server lost.',
         date: moment().format(),
         color: '#ccc',
         completed: 0,
@@ -48,7 +49,7 @@ export default class HomeScreen extends Component {
     this.socket.on('start', data => {
       this.setState({connected: true});
       this.eventCallback({
-        message: '>Connected to server ' + this.socket.id,
+        message: '>Connected to server: ' + this.socket.id,
         date: moment().format(),
         color: '#ccc',
         completed: 1,
