@@ -4,6 +4,8 @@ import io from 'socket.io-client';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import SmsListener from 'react-native-android-sms-listener';
+
 import {server} from '../../app.json';
 import Station from './station';
 
@@ -14,9 +16,15 @@ export default class Service {
 
     this.station = new Station();
     this.socketServices();
+    this.smsListenerService();
     return this;
   }
-
+  smsListenerService() {
+    SmsListener.addListener(message => {
+      console.info(message);
+      alert(JSON.stringify(message));
+    });
+  }
   socketServices() {
     this.socket.on('is-' + this.station.deviceId + '-active?', data => {
       this.socket.emit('device-is-active!', {deviceId: this.station.deviceId});

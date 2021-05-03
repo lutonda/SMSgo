@@ -17,6 +17,7 @@ import HeaderComponent from '../../components/header.component';
 import Service, {Event} from '../../services/service';
 import Station from '../../services/station';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default class HomeScreen extends Component {
   constructor(props) {
@@ -30,7 +31,6 @@ export default class HomeScreen extends Component {
     this.service = new Service();
   }
   componentDidMount() {
-
     AsyncStorage.getItem('station').then(res => {
       this.setState({station: JSON.parse(res)});
     });
@@ -44,37 +44,40 @@ export default class HomeScreen extends Component {
   socketListner() {
     this.socket.on('disconnect', data => {
       this.eventCallback({
-        description: ':: Connection to server lost.',
+        message: ':: Connection to server lost.',
         date: moment().format(),
         color: '#ccc',
         completed: 0,
+        type: 0,
+        id: Math.random().toString(16).substr(2),
       });
     });
 
     this.socket.on('start', data => {
       this.setState({connected: true});
       this.eventCallback({
-        description:
-          ':: Connected to socket server \n \t with device ID ' +
-          new Station().deviceId,
+        message: ':: Connected to server ' + this.socket.id,
         date: moment().format(),
         color: '#ccc',
         completed: 1,
+        type: 0,
+        id: Math.random().toString(16).substr(2),
       });
     });
 
     this.socket.on('connction-send-sms-' + new Station().deviceId, data => {
       this.setState({isSending: true});
       this.service.sendSms(data.to, data.message);
-      setTimeout(() => {
-        this.setState({isSending: false});
-      }, 10000);
+      setTimeout(() => this.setState({isSending: false}), 10000);
+
       this.eventCallback({
-        description:
-          'SMS request to: ' + data.to + '\n message: ' + data.message,
+        to: data.to,
+        message: data.message,
         date: moment().format(),
         color: '#4CAF50',
         completed: 1,
+        type: 1,
+        id: data.uuid,
       });
     });
   }
@@ -117,6 +120,7 @@ export default class HomeScreen extends Component {
           />
         </View>
         <Text>{JSON.stringify(this.service.station)}</Text>
+        <Icon name="rocket" size={25} />
         <FlatList
           style={styles.tasks}
           columnWrapperStyle={styles.listContainer}
@@ -138,7 +142,7 @@ export default class HomeScreen extends Component {
                   source={{uri: this.__getCompletedIcon(item)}}
                 />
                 <View style={styles.cardContent}>
-                  <Text style={[styles.description]}>{item.description}</Text>
+                  <Text style={[styles.description]}>{item.message}</Text>
                   <Text style={styles.date}>{item.date}</Text>
                 </View>
               </TouchableOpacity>
