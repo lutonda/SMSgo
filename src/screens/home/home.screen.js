@@ -1,15 +1,5 @@
 import React, {Component} from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TouchableOpacity,
-  FlatList,
-  Dimensions,
-  ScrollView,
-  Alert,
-} from 'react-native';
+import {StyleSheet, Text, View, FlatList} from 'react-native';
 
 import moment from 'moment';
 
@@ -18,6 +8,8 @@ import Service, {Event} from '../../services/service';
 import Station from '../../services/station';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
+
+import EventCardComponent from '../../components/eventcard.component';
 
 export default class HomeScreen extends Component {
   constructor(props) {
@@ -56,7 +48,7 @@ export default class HomeScreen extends Component {
     this.socket.on('start', data => {
       this.setState({connected: true});
       this.eventCallback({
-        message: ':: Connected to server ' + this.socket.id,
+        message: '>Connected to server ' + this.socket.id,
         date: moment().format(),
         color: '#ccc',
         completed: 1,
@@ -88,27 +80,6 @@ export default class HomeScreen extends Component {
 
     this.setState({data});
   }
-  clickEventListener = item => {
-    Alert.alert('Item selected: ' + item.description);
-  };
-
-  __getCompletedIcon = item => {
-    if (item.completed === 1) {
-      return 'https://img.icons8.com/flat_round/64/000000/checkmark.png';
-    } else {
-      return 'https://img.icons8.com/flat_round/64/000000/delete-sign.png';
-    }
-  };
-
-  __getDescriptionStyle = item => {
-    if (item.completed === 1) {
-      return {
-        textDecorationLine: 'line-through',
-        fontStyle: 'italic',
-        color: '#808080',
-      };
-    }
-  };
 
   render() {
     return (
@@ -119,35 +90,14 @@ export default class HomeScreen extends Component {
             isSending={this.state.isSending}
           />
         </View>
-        <Text>{JSON.stringify(this.service.station)}</Text>
-        <Icon name="rocket" size={25} />
         <FlatList
           style={styles.tasks}
           columnWrapperStyle={styles.listContainer}
           data={this.state.data
             .sort((a, b) => new Date(a.date) - new Date(b.date))
             .reverse()}
-          keyExtractor={item => {
-            return item.id;
-          }}
-          renderItem={({item}) => {
-            return (
-              <TouchableOpacity
-                style={[styles.card, {borderColor: item.color}]}
-                onPress={() => {
-                  this.clickEventListener(item);
-                }}>
-                <Image
-                  style={styles.image}
-                  source={{uri: this.__getCompletedIcon(item)}}
-                />
-                <View style={styles.cardContent}>
-                  <Text style={[styles.description]}>{item.message}</Text>
-                  <Text style={styles.date}>{item.date}</Text>
-                </View>
-              </TouchableOpacity>
-            );
-          }}
+          keyExtractor={item => Math.random().toString(16).substr(2)}
+          renderItem={({item}) => <EventCardComponent event={item} />}
         />
       </View>
     );
@@ -161,46 +111,5 @@ const styles = StyleSheet.create({
   },
   tasks: {
     flex: 1,
-  },
-  cardContent: {
-    marginLeft: 20,
-    marginTop: 0,
-  },
-  image: {
-    width: 15,
-    height: 15,
-  },
-
-  card: {
-    shadowColor: '#00000021',
-    shadowOffset: {
-      width: 0,
-      height: 6,
-    },
-    shadowOpacity: 0.37,
-    shadowRadius: 7.49,
-    elevation: 12,
-
-    marginVertical: 5,
-    marginHorizontal: 10,
-    backgroundColor: 'white',
-    flexBasis: '46%',
-    padding: 10,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    borderLeftWidth: 6,
-  },
-
-  description: {
-    fontSize: 18,
-    flex: 1,
-    color: '#008080',
-    fontWeight: 'bold',
-  },
-  date: {
-    fontSize: 14,
-    flex: 1,
-    color: '#696969',
-    marginTop: 5,
   },
 });

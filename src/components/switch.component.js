@@ -11,7 +11,6 @@ export default class SwitchComponent extends Component {
   }
 
   check() {
-    debugger
     AsyncStorage.getItem('station').then(res => {
       if (res) {
         this.props.navigation.navigate('Home');
